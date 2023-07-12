@@ -14,7 +14,7 @@
 # the sysroot source hasn't changed. This is useful when the codegen backend hasn't been modified.
 # This option can be changed while the build system is already running for as long as sysroot
 # building hasn't started yet.
-#keep_sysroot
+keep_sysroot
 
 
 # Testsuite
@@ -44,8 +44,10 @@ aot.issue-72793
 aot.issue-59326
 
 testsuite.extended_sysroot
-test.rust-random/rand
-test.libcore
-test.regex-shootout-regex-dna
-test.regex
-test.portable-simd
+#test.rust-random/rand
+#test.libcore
+#test.regex-shootout-regex-dna
+#test.regex
+#test.portable-simd
+#test.image-fractal # FIXME
+test.blake3

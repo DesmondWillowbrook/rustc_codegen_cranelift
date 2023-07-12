@@ -51,7 +51,7 @@ pub(crate) fn codegen_inline_asm<'tcx>(
         }
 
         // Used by stdarch
-        if template[0] == InlineAsmTemplatePiece::String("mov ".to_string())
+        /*if template[0] == InlineAsmTemplatePiece::String("mov ".to_string())
             && matches!(
                 template[1],
                 InlineAsmTemplatePiece::Placeholder {
@@ -129,7 +129,7 @@ pub(crate) fn codegen_inline_asm<'tcx>(
             let destination_block = fx.get_block(destination.unwrap());
             fx.bcx.ins().jump(destination_block, &[]);
             return;
-        }
+        }*/
 
         // Used by compiler-builtins
         if fx.tcx.symbol_name(fx.instance).name.starts_with("___chkstk") {

@@ -15,6 +15,8 @@ pub(crate) fn prepare(dirs: &Dirs) {
     super::tests::RAND_REPO.fetch(dirs);
     super::tests::REGEX_REPO.fetch(dirs);
     super::tests::PORTABLE_SIMD_REPO.fetch(dirs);
+    super::tests::IMAGE_REPO.fetch(dirs);
+    super::tests::BLAKE3_REPO.fetch(dirs);
 }
 
 pub(crate) fn prepare_stdlib(dirs: &Dirs, rustc: &Path) {

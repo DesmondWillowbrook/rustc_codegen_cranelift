@@ -137,6 +137,26 @@ static LIBCORE_TESTS_SRC: RelPath = RelPath::BUILD.join("coretests");
 
 static LIBCORE_TESTS: CargoProject = CargoProject::new(&LIBCORE_TESTS_SRC, "coretests_target");
 
+pub(crate) static IMAGE_REPO: GitRepo = GitRepo::github(
+    "image-rs",
+    "image",
+    "6efcc15589640b6bd1c0dc85ec1e39910ea6c58f",
+    "77d7061e3ef3f58c",
+    "image",
+);
+
+static IMAGE: CargoProject = CargoProject::new(&IMAGE_REPO.source_dir(), "image_target");
+
+pub(crate) static BLAKE3_REPO: GitRepo = GitRepo::github(
+    "BLAKE3-team",
+    "BLAKE3",
+    "3f396d223946f722ab060fe9377cd1cebacaf4c0",
+    "26d5a53578977197",
+    "blake3",
+);
+
+static BLAKE3: CargoProject = CargoProject::new(&BLAKE3_REPO.source_dir(), "blake3_target");
+
 const EXTENDED_SYSROOT_SUITE: &[TestCase] = &[
     TestCase::custom("test.rust-random/rand", &|runner| {
         RAND_REPO.patch(&runner.dirs);
@@ -242,6 +262,59 @@ const EXTENDED_SYSROOT_SUITE: &[TestCase] = &[
 
         if runner.is_native {
             let mut test_cmd = PORTABLE_SIMD.test(&runner.target_compiler, &runner.dirs);
+            test_cmd.arg("-q");
+            spawn_and_wait(test_cmd);
+        }
+    }),
+    TestCase::custom("test.image-fractal", &|runner| {
+        IMAGE_REPO.patch(&runner.dirs);
+
+        IMAGE.clean(&runner.dirs);
+
+        let mut build_cmd = IMAGE.build(&runner.target_compiler, &runner.dirs);
+        build_cmd
+            .arg("--example")
+            .arg("fractal")
+            .arg("--no-default-features")
+            .arg("--features")
+            .arg("png");
+        spawn_and_wait(build_cmd);
+
+        if runner.is_native {
+            let mut run_cmd = IMAGE.run(&runner.target_compiler, &runner.dirs);
+            run_cmd
+                .arg("--example")
+                .arg("fractal")
+                .arg("--no-default-features")
+                .arg("--features")
+                .arg("png");
+            run_cmd.current_dir(IMAGE.target_dir(&runner.dirs));
+
+            spawn_and_wait(run_cmd);
+
+            let expected =
+                fs::read(IMAGE.source_dir(&runner.dirs).join("examples").join("fractal.png"))
+                    .unwrap();
+            let output = fs::read(IMAGE.target_dir(&runner.dirs).join("fractal.png")).unwrap();
+
+            if output != expected {
+                println!("Output files don't match!");
+
+                std::process::exit(1);
+            }
+        }
+    }),
+    TestCase::custom("test.blake3", &|runner| {
+        BLAKE3_REPO.patch(&runner.dirs);
+
+        BLAKE3.clean(&runner.dirs);
+
+        let mut build_cmd = BLAKE3.build(&runner.target_compiler, &runner.dirs);
+        build_cmd.arg("--all-targets");
+        spawn_and_wait(build_cmd);
+
+        if runner.is_native {
+            let mut test_cmd = BLAKE3.test(&runner.target_compiler, &runner.dirs);
             test_cmd.arg("-q");
             spawn_and_wait(test_cmd);
         }
