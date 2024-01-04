@@ -40,7 +40,8 @@ use rustc_data_structures::profiling::SelfProfilerRef;
 use rustc_errors::ErrorGuaranteed;
 use rustc_metadata::EncodedMetadata;
 use rustc_middle::dep_graph::{WorkProduct, WorkProductId};
-use rustc_session::config::OutputFilenames;
+use rustc_session::config::{CrateType, OutputFilenames, OutputType};
+use rustc_session::output::out_filename;
 use rustc_session::Session;
 use rustc_span::{sym, Symbol};
 
@@ -261,11 +262,17 @@ impl CodegenBackend for CraneliftCodegenBackend {
         use rustc_codegen_ssa::back::link::link_binary;
 
         if sess.target.arch == "wasm32" {
-            std::fs::copy(
-                codegen_results.modules[0].object.as_ref().unwrap(),
-                outputs.single_output_file.as_ref().unwrap().as_path(),
-            )
-            .unwrap();
+            let output = out_filename(
+                sess,
+                CrateType::Executable,
+                outputs,
+                codegen_results.crate_info.local_crate_name,
+            );
+            let crate_name = format!("{}", codegen_results.crate_info.local_crate_name);
+            let out_filename =
+                output.file_for_writing(outputs, OutputType::Exe, Some(crate_name.as_str()));
+            std::fs::copy(codegen_results.modules[0].object.as_ref().unwrap(), out_filename)
+                .unwrap();
             return Ok(());
         }
 
