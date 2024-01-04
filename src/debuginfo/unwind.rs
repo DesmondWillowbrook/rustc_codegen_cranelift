@@ -16,48 +16,17 @@ pub(crate) struct UnwindContext {
 }
 
 impl UnwindContext {
-    pub(crate) fn new(isa: &dyn TargetIsa, pic_eh_frame: bool) -> Self {
-        let endian = match isa.endianness() {
-            Endianness::Little => RunTimeEndian::Little,
-            Endianness::Big => RunTimeEndian::Big,
-        };
-        let mut frame_table = FrameTable::default();
+    pub(crate) fn new(_pic_eh_frame: bool) -> Self {
+        let endian = RunTimeEndian::Little;
+        let frame_table = FrameTable::default();
 
-        let cie_id = if let Some(mut cie) = isa.create_systemv_cie() {
-            if pic_eh_frame {
-                cie.fde_address_encoding =
-                    gimli::DwEhPe(gimli::DW_EH_PE_pcrel.0 | gimli::DW_EH_PE_sdata4.0);
-            }
-            Some(frame_table.add_cie(cie))
-        } else {
-            None
-        };
+        let cie_id = None;
 
         UnwindContext { endian, frame_table, cie_id }
     }
 
-    pub(crate) fn add_function(&mut self, func_id: FuncId, context: &Context, isa: &dyn TargetIsa) {
-        let unwind_info = if let Some(unwind_info) =
-            context.compiled_code().unwrap().create_unwind_info(isa).unwrap()
-        {
-            unwind_info
-        } else {
-            return;
-        };
-
-        match unwind_info {
-            UnwindInfo::SystemV(unwind_info) => {
-                self.frame_table.add_fde(
-                    self.cie_id.unwrap(),
-                    unwind_info
-                        .to_fde(Address::Symbol { symbol: func_id.as_u32() as usize, addend: 0 }),
-                );
-            }
-            UnwindInfo::WindowsX64(_) => {
-                // FIXME implement this
-            }
-            unwind_info => unimplemented!("{:?}", unwind_info),
-        }
+    pub(crate) fn add_function(&mut self, _func_id: FuncId, _context: &Context) {
+        return;
     }
 
     pub(crate) fn emit(self, product: &mut ObjectProduct) {

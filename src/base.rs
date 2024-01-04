@@ -210,6 +210,7 @@ pub(crate) fn compile_fn(
         }
     }
 
+    /*
     // Define debuginfo for function
     let isa = module.isa();
     let debug_context = &mut cx.debug_context;
@@ -222,8 +223,9 @@ pub(crate) fn compile_fn(
                 context,
             );
         }
-        unwind_context.add_function(codegened_func.func_id, &context, isa);
+        unwind_context.add_function(codegened_func.func_id, &context);
     });
+    */
 }
 
 pub(crate) fn verify_func(

@@ -6,7 +6,7 @@ mod object;
 mod unwind;
 
 use cranelift_codegen::ir::Endianness;
-use cranelift_codegen::isa::TargetIsa;
+use cranelift_codegen::isa::{TargetFrontendConfig, TargetIsa};
 use gimli::write::{
     Address, AttributeValue, DwarfUnit, FileId, LineProgram, LineString, Range, RangeList,
     UnitEntryId,
@@ -42,7 +42,7 @@ pub(crate) struct FunctionDebugContext {
 }
 
 impl DebugContext {
-    pub(crate) fn new(tcx: TyCtxt<'_>, isa: &dyn TargetIsa) -> Self {
+    pub(crate) fn new(tcx: TyCtxt<'_>, frontend_config: TargetFrontendConfig) -> Self {
         let encoding = Encoding {
             format: Format::Dwarf32,
             // FIXME this should be configurable
@@ -55,13 +55,10 @@ impl DebugContext {
                 // support it.
                 4
             },
-            address_size: isa.frontend_config().pointer_bytes(),
+            address_size: frontend_config.pointer_bytes(),
         };
 
-        let endian = match isa.endianness() {
-            Endianness::Little => RunTimeEndian::Little,
-            Endianness::Big => RunTimeEndian::Big,
-        };
+        let endian = RunTimeEndian::Little;
 
         let mut dwarf = DwarfUnit::new(encoding);
 

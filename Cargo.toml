@@ -22,6 +22,8 @@ indexmap = "2.0.0"
 libloading = { version = "0.7.3", optional = true }
 smallvec = "1.8.1"
 
+waffle = "0.0.22"
+
 [patch.crates-io]
 # Uncomment to use local checkout of cranelift
 #cranelift-codegen = { path = "../wasmtime/cranelift/codegen" }
@@ -41,3 +43,6 @@ inline_asm_sym = []
 
 [package.metadata.rust-analyzer]
 rustc_private = true
+
+[profile.release.package.rustc_codegen_cranelift]
+opt-level = 0

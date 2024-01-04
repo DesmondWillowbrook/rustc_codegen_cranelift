@@ -489,10 +489,12 @@ fn panic_cannot_unwind() -> ! {
     }
 }
 
+/*
 #[lang = "eh_personality"]
 fn eh_personality() -> ! {
     loop {}
 }
+*/
 
 #[lang = "drop_in_place"]
 #[allow(unconditional_recursion)]
@@ -695,7 +697,7 @@ pub macro global_asm() {
     /* compiler built-in */
 }
 
-pub static A_STATIC: u8 = 42;
+//pub static A_STATIC: u8 = 42;
 
 #[lang = "panic_location"]
 struct PanicLocation {
@@ -704,6 +706,7 @@ struct PanicLocation {
     column: u32,
 }
 
+/*
 #[no_mangle]
 #[cfg(not(all(windows, target_env = "gnu")))]
 pub fn get_tls() -> u8 {
@@ -712,3 +715,4 @@ pub fn get_tls() -> u8 {
 
     A
 }
+*/

@@ -75,7 +75,7 @@ fn create_jit_module(
     let mut cx = crate::CodegenCx::new(
         tcx,
         backend_config.clone(),
-        jit_module.isa(),
+        jit_module.isa().frontend_config(),
         false,
         Symbol::intern("dummy_cgu_name"),
     );
@@ -283,7 +283,7 @@ fn jit_fn(instance_ptr: *const Instance<'static>, trampoline_ptr: *const u8) -> 
             let mut cx = crate::CodegenCx::new(
                 tcx,
                 backend_config,
-                jit_module.isa(),
+                jit_module.isa().frontend_config(),
                 false,
                 Symbol::intern("dummy_cgu_name"),
             );
@@ -403,5 +403,5 @@ fn codegen_shim<'tcx>(
     trampoline_builder.ins().return_(&ret_vals);
 
     module.define_function(func_id, context).unwrap();
-    cx.unwind_context.add_function(func_id, context, module.isa());
+    cx.unwind_context.add_function(func_id, context);
 }
