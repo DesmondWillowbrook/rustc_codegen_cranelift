@@ -35,6 +35,8 @@ waffle = "0.0.22"
 
 #gimli = { path = "../" }
 
+waffle = { path = "waffle" }
+
 [features]
 # Enable features not ready to be enabled when compiling as part of rustc
 unstable-features = ["jit", "inline_asm_sym"]
