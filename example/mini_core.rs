@@ -471,11 +471,14 @@ pub fn panic(_msg: &'static str) -> ! {
 #[track_caller]
 fn panic_bounds_check(index: usize, len: usize) -> ! {
     unsafe {
+        #[cfg(not(all(target_os = "macos", target_arch = "aarch64")))]
         libc::printf(
             "index out of bounds: the len is %d but the index is %d\n\0" as *const str as *const i8,
             len,
             index,
         );
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        libc::puts("index out of bounds\n\0" as *const str as *const i8);
         intrinsics::abort();
     }
 }
@@ -614,6 +617,8 @@ pub mod libc {
     #[cfg_attr(unix, link(name = "c"))]
     #[cfg_attr(target_env = "msvc", link(name = "legacy_stdio_definitions"))]
     extern "C" {
+        // FIXME abi incompatibility with varargs on arm64 macOS
+        #[cfg(not(all(target_os = "macos", target_arch = "aarch64")))]
         pub fn printf(format: *const i8, ...) -> i32;
     }
 

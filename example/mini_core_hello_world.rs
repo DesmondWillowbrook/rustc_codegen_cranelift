@@ -177,6 +177,7 @@ fn main() {
     assert_eq!(slice_ptr as usize % 4, 0);
 
     unsafe {
+        #[cfg(not(all(target_os = "macos", target_arch = "aarch64")))]
         printf("Hello %s\n\0" as *const str as *const i8, "printf\0" as *const str as *const i8);
 
         let hello: &[u8] = b"Hello\0" as &[u8; 6];

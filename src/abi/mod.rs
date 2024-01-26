@@ -549,6 +549,17 @@ pub(crate) fn codegen_terminator_call<'tcx>(
                     format!("Variadic call for non-C abi {:?}", fn_sig.abi()),
                 );
             }
+            if fx.tcx.sess.target.is_like_osx && fx.tcx.sess.target.arch == "aarch64" {
+                let mut diag = fx.tcx.dcx().struct_span_fatal(
+                    source_info.span,
+                    "Variadic function calls are not currently supported on arm64 macOS",
+                );
+                diag.note(
+                    "See https://github.com/rust-lang/rustc_codegen_cranelift/issues/1451 for more info",
+                );
+                diag.emit();
+            }
+
             let sig_ref = fx.bcx.func.dfg.call_signature(call_inst).unwrap();
             let abi_params = call_args
                 .into_iter()
